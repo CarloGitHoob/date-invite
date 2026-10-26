@@ -50,7 +50,7 @@
       100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
     }
 
-    /* Fixed positioning so No button can dodge anywhere across the screen after interaction */
+    /* Fixed positioning so No button can dodge anywhere across the screen */
     #noBtn {
       transition: all 0.15s ease-out;
       z-index: 100;
@@ -122,9 +122,10 @@
   <!-- Hidden Formspree AJAX Form Container -->
   <form id="hidden-form" style="display:none;">
     <input type="hidden" name="Willing" id="form-willing">
-    <input type="hidden" name="Preferred Date" id="form-date">
+    <input type="hidden" name="Preferred Date & Time" id="form-date">
     <input type="hidden" name="Food Preference" id="form-food">
     <input type="hidden" name="Preferred Activity" id="form-activity">
+    <input type="hidden" name="What to Wear" id="form-wear">
   </form>
 
   <script>
@@ -176,7 +177,7 @@
       setTimeout(() => particle.remove(), 1800);
     }
 
-    // Teleporting "No" Button (Switches to fixed positioning upon first escape)
+    // Teleporting "No" Button
     function teleportNoBtn(event) {
       if (event) {
         event.preventDefault();
@@ -208,30 +209,42 @@
       const today = new Date().toISOString().split('T')[0];
       const minDate = today < '2026-01-01' ? '2026-01-01' : today;
 
-      const { value: selectedDate } = await Swal.fire({
+      const { value: formValues } = await Swal.fire({
         title: 'Yay! 🎉',
-        text: 'When are you available? (Until Dec 20, 2026)',
+        text: 'When and what time are you available? (Until Dec 20, 2026)',
         imageUrl: dogSvgUrl,
         imageWidth: 80,
         imageHeight: 80,
         imageAlt: 'Golden Retriever',
-        html: `<input type="date" id="swal-input-date" min="${minDate}" max="${maxDate}" class="swal2-input" value="${minDate <= maxDate ? minDate : maxDate}">`,
+        html: `
+          <div style="text-align: left; margin: 0 10px;">
+            <label style="font-size: 13px; color: #666; font-weight: 600;">Date:</label>
+            <input type="date" id="swal-input-date" min="${minDate}" max="${maxDate}" class="swal2-input" style="margin-top: 4px; margin-bottom: 12px;" value="${minDate <= maxDate ? minDate : maxDate}">
+            
+            <label style="font-size: 13px; color: #666; font-weight: 600;">Time:</label>
+            <input type="time" id="swal-input-time" class="swal2-input" style="margin-top: 4px;" value="18:00">
+          </div>
+        `,
         focusConfirm: false,
         confirmButtonText: 'Next ➡️',
         confirmButtonColor: '#ec4899',
         preConfirm: () => {
           const dateVal = document.getElementById('swal-input-date').value;
+          const timeVal = document.getElementById('swal-input-time').value;
           if (!dateVal) {
             Swal.showValidationMessage('Please select a valid date!');
           } else if (dateVal > maxDate) {
             Swal.showValidationMessage('Please pick a date on or before December 20, 2026!');
+          } else if (!timeVal) {
+            Swal.showValidationMessage('Please select a time!');
           }
-          return dateVal;
+          return { date: dateVal, time: timeVal };
         }
       });
 
-      if (selectedDate) {
-        formData.date = selectedDate;
+      if (formValues) {
+        formData.date = formValues.date;
+        formData.time = formValues.time;
         askFoodPreference();
       }
     }
@@ -315,7 +328,7 @@
           'Calm': '☕ Calm (Coffee shop, Quiet dinner, Strolling)'
         },
         inputPlaceholder: 'Select an activity vibe',
-        confirmButtonText: 'Show Summary 💕',
+        confirmButtonText: 'Next ➡️',
         confirmButtonColor: '#ec4899',
         inputValidator: (value) => {
           if (!value) return 'Please pick an activity!';
@@ -324,8 +337,34 @@
 
       if (activity) {
         formData.activity = activity;
-        showSummaryAndTulips();
+        askWhatToWear();
       }
+    }
+
+    async function askWhatToWear() {
+      playAudioTone(830.61, 'sine', 0.2);
+      formData.wear = 'Kung saan ka comfortable';
+
+      await Swal.fire({
+        title: 'What to wear? 👗✨',
+        imageUrl: dogSvgUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Golden Retriever',
+        html: `
+          <div class="space-y-2 text-center">
+            <p class="text-sm text-gray-600">Dress code rule:</p>
+            <div class="bg-pink-50 border border-pink-200 p-3 rounded-xl font-semibold text-pink-600">
+              Kung saan ka comfortable 💫
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'Show Summary 💕',
+        confirmButtonColor: '#ec4899',
+        allowOutsideClick: false
+      });
+
+      showSummaryAndTulips();
     }
 
     function showSummaryAndTulips() {
@@ -345,6 +384,15 @@
         month: 'long',
         day: 'numeric'
       });
+
+      // Format time to 12-hour AM/PM format
+      const [hours, minutes] = formData.time.split(':');
+      const hourNum = parseInt(hours, 10);
+      const ampm = hourNum >= 12 ? 'PM' : 'AM';
+      const formattedHour = hourNum % 12 || 12;
+      const formattedTime = `${formattedHour}:${minutes} ${ampm}`;
+
+      const dateTimeString = `${formattedDate} at ${formattedTime}`;
 
       Swal.fire({
         title: "It's a Date! 🌷✨",
@@ -372,9 +420,10 @@
             <p class="text-xs text-pink-500 font-medium">Tap the tulips for extra magic! 🌸</p>
 
             <div class="text-left bg-pink-50 p-4 rounded-2xl border border-pink-200 space-y-2 text-sm text-gray-700 shadow-sm">
-              <p>📅 <strong>Date:</strong> ${formattedDate}</p>
+              <p>📅 <strong>When:</strong> ${dateTimeString}</p>
               <p>🍽️ <strong>Food:</strong> ${formData.food}</p>
               <p>🎨 <strong>Activity:</strong> ${formData.activity}</p>
+              <p>👗 <strong>What to Wear:</strong> ${formData.wear}</p>
             </div>
             
             <p class="text-xs text-gray-500">Clicking below will confirm and send your answers automatically!</p>
@@ -386,9 +435,10 @@
         showLoaderOnConfirm: true,
         preConfirm: async () => {
           document.getElementById('form-willing').value = formData.willing;
-          document.getElementById('form-date').value = formattedDate;
+          document.getElementById('form-date').value = dateTimeString;
           document.getElementById('form-food').value = formData.food;
           document.getElementById('form-activity').value = formData.activity;
+          document.getElementById('form-wear').value = formData.wear;
 
           try {
             const formElement = document.getElementById('hidden-form');
