@@ -112,7 +112,7 @@
       <button id="yesBtn" onclick="handleYes()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg hover:shadow-pink-500/40 transition-all transform hover:scale-105 active:scale-95 z-20">
         Yes! 💕
       </button>
-      <!-- The Elusive No Button -->
+      <!-- The Elusive No Button (teleports instantly on hover, touch, or click) -->
       <button id="noBtn" onmouseover="teleportNoBtn()" ontouchstart="teleportNoBtn()" onclick="teleportNoBtn()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md">
         No
       </button>
@@ -144,7 +144,6 @@
 
     // Tap/Click particle animation
     function createHeartParticle(event) {
-      // Prevent particle trigger if clicking buttons directly
       if (event.target.tagName === 'BUTTON') return;
       
       const hearts = ['💖', '💕', '🌸', '✨', '🐾', '🌷'];
@@ -157,12 +156,11 @@
       setTimeout(() => particle.remove(), 1800);
     }
 
-    // Completely Teleporting "No" Button
+    // Completely Teleporting "No" Button (No popups)
     function teleportNoBtn() {
       playAudioTone(300, 'triangle', 0.1);
       const noBtn = document.getElementById('noBtn');
       
-      // Get safe window boundaries
       const padding = 80;
       const maxX = window.innerWidth - noBtn.offsetWidth - padding;
       const maxY = window.innerHeight - noBtn.offsetHeight - padding;
@@ -175,7 +173,7 @@
     }
 
     async function handleYes() {
-      playAudioTone(587.33, 'sine', 0.2); // D5 note
+      playAudioTone(587.33, 'sine', 0.2);
       formData.willing = 'Yes';
       const maxDate = '2026-12-20';
       const today = new Date().toISOString().split('T')[0];
@@ -206,7 +204,7 @@
     }
 
     async function askFoodPreference() {
-      playAudioTone(659.25, 'sine', 0.2); // E5 note
+      playAudioTone(659.25, 'sine', 0.2);
       const { value: foodPreference } = await Swal.fire({
         title: 'What food do you prefer? 🍽️',
         input: 'select',
@@ -262,7 +260,7 @@
     }
 
     async function askPreferredActivity() {
-      playAudioTone(783.99, 'sine', 0.2); // G5 note
+      playAudioTone(783.99, 'sine', 0.2);
       const { value: activity } = await Swal.fire({
         title: 'What is your preferred activity? ✨',
         input: 'select',
@@ -286,12 +284,10 @@
     }
 
     function showSummaryAndTulips() {
-      // Victory Fanfare Audio Sequence
       [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
         setTimeout(() => playAudioTone(freq, 'triangle', 0.3), idx * 150);
       });
 
-      // Burst Confetti
       confetti({
         particleCount: 150,
         spread: 90,
@@ -309,7 +305,6 @@
         title: "It's a Date! 🌷✨",
         html: `
           <div class="text-center space-y-3">
-            <!-- Interactive Tulip Bouquet Vector -->
             <div class="flex justify-center my-2 tulip-interactive" onclick="playAudioTone(880, 'sine', 0.2); confetti({ particleCount: 30, spread: 50 });">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" class="w-40 h-32 transform transition hover:scale-110">
                 <path d="M100,120 Q90,90 80,40" stroke="#4CAF50" stroke-width="4" fill="none"/>
@@ -380,4 +375,3 @@
   </script>
 </body>
 </html>
-
