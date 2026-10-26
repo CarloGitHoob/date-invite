@@ -50,6 +50,13 @@
       100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
     }
 
+    /* Absolute positioning for the jumping No button */
+    #noBtn {
+      position: fixed;
+      transition: all 0.15s ease-out;
+      z-index: 100;
+    }
+
     /* Interactive Tulip Bounce */
     .tulip-interactive {
       cursor: pointer;
@@ -105,20 +112,20 @@
       <button id="yesBtn" onclick="handleYes()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg hover:shadow-pink-500/40 transition-all transform hover:scale-105 active:scale-95 z-20">
         Yes! 💕
       </button>
-      <button id="noBtn" onmouseover="runAwayNoBtn()" onclick="handleNo()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl transition-all z-20 absolute right-8">
+      <!-- The Elusive No Button -->
+      <button id="noBtn" onmouseover="teleportNoBtn()" ontouchstart="teleportNoBtn()" onclick="teleportNoBtn()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md">
         No
       </button>
     </div>
   </div>
 
   <script>
-    let noClickCount = 0;
     let formData = {};
 
-    // 🔴 REPLACE WITH YOUR ACTUAL FORMSPREE FORM ID (e.g. xbo3821n) 🔴
+    // 🔴 REPLACE YOUR_FORMSPREE_FORM_ID WITH YOUR ACTUAL ID (e.g., xbo3821n) 🔴
     const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORMSPREE_FORM_ID';
 
-    // Sound Synthesizer Effects (No external audio files needed)
+    // Sound Synthesizer Effects
     function playAudioTone(freq, type = 'sine', duration = 0.15) {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -137,6 +144,9 @@
 
     // Tap/Click particle animation
     function createHeartParticle(event) {
+      // Prevent particle trigger if clicking buttons directly
+      if (event.target.tagName === 'BUTTON') return;
+      
       const hearts = ['💖', '💕', '🌸', '✨', '🐾', '🌷'];
       const particle = document.createElement('div');
       particle.className = 'heart-particle';
@@ -147,36 +157,21 @@
       setTimeout(() => particle.remove(), 1800);
     }
 
-    // Playful runaway "No" button logic
-    function runAwayNoBtn() {
+    // Completely Teleporting "No" Button
+    function teleportNoBtn() {
       playAudioTone(300, 'triangle', 0.1);
       const noBtn = document.getElementById('noBtn');
-      const yesBtn = document.getElementById('yesBtn');
-
-      // Random position offsets
-      const x = (Math.random() - 0.5) * 220;
-      const y = (Math.random() - 0.5) * 120;
       
-      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+      // Get safe window boundaries
+      const padding = 80;
+      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
       
-      noClickCount++;
-      if (noClickCount > 2) {
-        yesBtn.classList.add('scale-125');
-      }
-    }
-
-    function handleNo() {
-      playAudioTone(200, 'sawtooth', 0.2);
-      runAwayNoBtn();
-      Swal.fire({
-        title: 'Nice try! 😜',
-        text: 'The "No" button seems to be running away! Give "Yes" a click!',
-        icon: 'warning',
-        confirmButtonText: 'Okay fine! 💕',
-        confirmButtonColor: '#ec4899'
-      }).then(() => {
-        handleYes();
-      });
+      const randomX = Math.max(padding, Math.random() * maxX);
+      const randomY = Math.max(padding, Math.random() * maxY);
+      
+      noBtn.style.left = `${randomX}px`;
+      noBtn.style.top = `${randomY}px`;
     }
 
     async function handleYes() {
@@ -385,3 +380,4 @@
   </script>
 </body>
 </html>
+
