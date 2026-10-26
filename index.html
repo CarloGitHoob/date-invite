@@ -125,6 +125,20 @@
     // 🔴 REPLACE WITH YOUR ACTUAL FORMSPREE FORM ID (e.g. xbo3821n) 🔴
     const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORMSPREE_FORM_ID';
 
+    // Reusable Golden Retriever Graphic Data URI for Popups
+    const dogSvgUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" width="90" height="90">
+        <circle cx="100" cy="85" r="45" fill="#F4C085"/>
+        <path d="M60,65 Q45,90 60,115 Q70,100 65,80 Z" fill="#D49353"/>
+        <path d="M140,65 Q155,90 140,115 Q130,100 135,80 Z" fill="#D49353"/>
+        <ellipse cx="100" cy="98" rx="20" ry="15" fill="#FCE8D0"/>
+        <ellipse cx="100" cy="93" rx="8" ry="6" fill="#3E2723"/>
+        <circle cx="85" cy="75" r="4" fill="#3E2723"/>
+        <circle cx="115" cy="75" r="4" fill="#3E2723"/>
+        <path d="M93,106 Q100,120 107,106 Z" fill="#FF6B81"/>
+      </svg>
+    `);
+
     // Sound Synthesizer Effects
     function playAudioTone(freq, type = 'sine', duration = 0.15) {
       try {
@@ -189,6 +203,10 @@
       const { value: selectedDate } = await Swal.fire({
         title: 'Yay! 🎉',
         text: 'When are you available? (Until Dec 20, 2026)',
+        imageUrl: dogSvgUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Golden Retriever',
         html: `<input type="date" id="swal-input-date" min="${minDate}" max="${maxDate}" class="swal2-input" value="${minDate <= maxDate ? minDate : maxDate}">`,
         focusConfirm: false,
         confirmButtonText: 'Next ➡️',
@@ -214,6 +232,10 @@
       playAudioTone(659.25, 'sine', 0.2);
       const { value: foodPreference } = await Swal.fire({
         title: 'What food do you prefer? 🍽️',
+        imageUrl: dogSvgUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Golden Retriever',
         input: 'select',
         inputOptions: {
           'Chinese': 'Chinese 🥢',
@@ -244,6 +266,10 @@
       playAudioTone(659.25, 'sine', 0.2);
       const { value: customFood } = await Swal.fire({
         title: 'Specify your preferred cuisine 🍕🍝',
+        imageUrl: dogSvgUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Golden Retriever',
         text: 'Type what you are craving for:',
         input: 'text',
         inputPlaceholder: 'e.g., Italian, Mediterranean, Spanish, Thai...',
@@ -270,6 +296,10 @@
       playAudioTone(783.99, 'sine', 0.2);
       const { value: activity } = await Swal.fire({
         title: 'What is your preferred activity? ✨',
+        imageUrl: dogSvgUrl,
+        imageWidth: 80,
+        imageHeight: 80,
+        imageAlt: 'Golden Retriever',
         input: 'select',
         inputOptions: {
           'Artsy': '🎨 Artsy (Museums, Painting, Galleries)',
@@ -372,6 +402,10 @@
           playAudioTone(1046.50, 'sine', 0.4);
           Swal.fire({
             title: 'Response Sent! ❤️',
+            imageUrl: dogSvgUrl,
+            imageWidth: 80,
+            imageHeight: 80,
+            imageAlt: 'Golden Retriever',
             text: 'Your date preferences have been sent directly to Carlo. See you soon!',
             icon: 'success',
             confirmButtonColor: '#ec4899'
