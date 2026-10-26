@@ -50,9 +50,8 @@
       100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
     }
 
-    /* Fixed positioning so No button can dodge anywhere across the screen */
+    /* Fixed positioning so No button can dodge anywhere across the screen after interaction */
     #noBtn {
-      position: fixed;
       transition: all 0.15s ease-out;
       z-index: 100;
     }
@@ -108,12 +107,13 @@
       <p class="text-gray-500 text-sm mt-1">Our golden friend is waiting for your answer! 🐾</p>
     </div>
     
-    <div id="button-container" class="flex justify-center items-center gap-4 pt-2 relative min-h-[60px]">
+    <!-- Non-overlapping buttons container -->
+    <div id="button-container" class="flex justify-center items-center gap-6 pt-2 relative min-h-[60px]">
       <button id="yesBtn" onclick="handleYes()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg hover:shadow-pink-500/40 transition-all transform hover:scale-105 active:scale-95 z-20">
         Yes! 💕
       </button>
-      <!-- Elusive No Button: Teleports instantly on mouseover, touchstart, or click -->
-      <button id="noBtn" onmouseover="teleportNoBtn(event)" ontouchstart="teleportNoBtn(event)" onclick="teleportNoBtn(event)" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md">
+      <!-- Elusive No Button -->
+      <button id="noBtn" onmouseover="teleportNoBtn(event)" ontouchstart="teleportNoBtn(event)" onclick="teleportNoBtn(event)" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md z-20">
         No
       </button>
     </div>
@@ -126,9 +126,6 @@
     <input type="hidden" name="Food Preference" id="form-food">
     <input type="hidden" name="Preferred Activity" id="form-activity">
   </form>
-
-  <!-- Formspree AJAX SDK -->
-  <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 
   <script>
     let formData = {};
@@ -179,7 +176,7 @@
       setTimeout(() => particle.remove(), 1800);
     }
 
-    // Teleporting "No" Button (No alerts or popups)
+    // Teleporting "No" Button (Switches to fixed positioning upon first escape)
     function teleportNoBtn(event) {
       if (event) {
         event.preventDefault();
@@ -187,6 +184,8 @@
       }
       playAudioTone(300, 'triangle', 0.1);
       const noBtn = document.getElementById('noBtn');
+      
+      noBtn.style.position = 'fixed';
       
       const padding = 20;
       const btnWidth = noBtn.offsetWidth || 80;
@@ -386,7 +385,6 @@
         allowOutsideClick: false,
         showLoaderOnConfirm: true,
         preConfirm: async () => {
-          // Populate hidden form fields
           document.getElementById('form-willing').value = formData.willing;
           document.getElementById('form-date').value = formattedDate;
           document.getElementById('form-food').value = formData.food;
