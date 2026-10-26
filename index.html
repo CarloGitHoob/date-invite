@@ -17,7 +17,7 @@
       animation: gradientBG 12s ease infinite;
       min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      overflow-x: hidden;
+      overflow: hidden;
       user-select: none;
     }
 
@@ -50,7 +50,7 @@
       100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
     }
 
-    /* Absolute positioning for the jumping No button */
+    /* Fixed positioning so No button can dodge anywhere across the screen */
     #noBtn {
       position: fixed;
       transition: all 0.15s ease-out;
@@ -112,8 +112,8 @@
       <button id="yesBtn" onclick="handleYes()" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-8 py-3 rounded-2xl shadow-lg hover:shadow-pink-500/40 transition-all transform hover:scale-105 active:scale-95 z-20">
         Yes! 💕
       </button>
-      <!-- The Elusive No Button (teleports instantly on hover, touch, or click) -->
-      <button id="noBtn" onmouseover="teleportNoBtn()" ontouchstart="teleportNoBtn()" onclick="teleportNoBtn()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md">
+      <!-- Elusive No Button: Teleports instantly on mouseover, touchstart, or click -->
+      <button id="noBtn" onmouseover="teleportNoBtn(event)" ontouchstart="teleportNoBtn(event)" onclick="teleportNoBtn(event)" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-6 py-3 rounded-2xl shadow-md">
         No
       </button>
     </div>
@@ -122,7 +122,7 @@
   <script>
     let formData = {};
 
-    // 🔴 REPLACE YOUR_FORMSPREE_FORM_ID WITH YOUR ACTUAL ID (e.g., xbo3821n) 🔴
+    // 🔴 REPLACE WITH YOUR ACTUAL FORMSPREE FORM ID (e.g. xbo3821n) 🔴
     const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORMSPREE_FORM_ID';
 
     // Sound Synthesizer Effects
@@ -156,17 +156,24 @@
       setTimeout(() => particle.remove(), 1800);
     }
 
-    // Completely Teleporting "No" Button (No popups)
-    function teleportNoBtn() {
+    // Teleporting "No" Button (No alerts or popups)
+    function teleportNoBtn(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
       playAudioTone(300, 'triangle', 0.1);
       const noBtn = document.getElementById('noBtn');
       
-      const padding = 80;
-      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
-      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+      const padding = 20;
+      const btnWidth = noBtn.offsetWidth || 80;
+      const btnHeight = noBtn.offsetHeight || 40;
       
-      const randomX = Math.max(padding, Math.random() * maxX);
-      const randomY = Math.max(padding, Math.random() * maxY);
+      const maxX = window.innerWidth - btnWidth - padding;
+      const maxY = window.innerHeight - btnHeight - padding;
+      
+      const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+      const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
       
       noBtn.style.left = `${randomX}px`;
       noBtn.style.top = `${randomY}px`;
